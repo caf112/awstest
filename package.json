@@ -5,6 +5,7 @@
   "dependencies": {
     "@aws-amplify/api": "^6.1.8",
     "@aws-amplify/pubsub": "^6.1.38",
+    "aws-amplify": "^6.10.3",
     "awstest": "file:",
     "cra-template": "1.2.0",
     "react": "^19.0.0",
