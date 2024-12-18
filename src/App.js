@@ -1,7 +1,8 @@
 import React, { useEffect, useReducer } from 'react';
 
-import API, { graphqlOperation } from '@aws-amplify/api';
-import PubSub from '@aws-amplify/pubsub';
+import { API, graphqlOperation } from '@aws-amplify/api';
+import { PubSub } from '@aws-amplify/pubsub';
+import Amplify from 'aws-amplify';
 
 import { createTodo } from './graphql/mutations';
 import { listTodos } from './graphql/queries';
@@ -10,8 +11,7 @@ import { onCreateTodo } from './graphql/subscriptions';
 import awsconfig from './aws-exports';
 import './App.css';
 
-API.configure(awsconfig);
-PubSub.configure(awsconfig);
+Amplify.configure(awsconfig);
 
 // Action Types
 const QUERY = 'QUERY';
@@ -24,16 +24,16 @@ const initialState = {
 const reducer = (state, action) => {
   switch (action.type) {
     case QUERY:
-      return {...state, todos: action.todos};
+      return { ...state, todos: action.todos };
     case SUBSCRIPTION:
-      return {...state, todos:[...state.todos, action.todo]}
+      return { ...state, todos: [...state.todos, action.todo] };
     default:
       return state;
   }
 };
 
 async function createNewTodo() {
-  const todo = { name: "Use AWS AppSync", description: "RealTime and Offline" };
+  const todo = { name: 'Use AWS AppSync', description: 'RealTime and Offline' };
   await API.graphql(graphqlOperation(createTodo, { input: todo }));
 }
 
@@ -51,7 +51,7 @@ function App() {
       next: (eventData) => {
         const todo = eventData.value.data.onCreateTodo;
         dispatch({ type: SUBSCRIPTION, todo });
-      }
+      },
     });
 
     return () => subscription.unsubscribe();
@@ -61,10 +61,15 @@ function App() {
     <div className="App">
       <button onClick={createNewTodo}>Add Todo</button>
       <div>
-        {state.todos.length > 0 ? 
-          state.todos.map((todo) => <p key={todo.id}>{todo.name} : {todo.description}</p>) :
-          <p>Add some todos!</p> 
-        }
+        {state.todos.length > 0 ? (
+          state.todos.map((todo) => (
+            <p key={todo.id}>
+              {todo.name} : {todo.description}
+            </p>
+          ))
+        ) : (
+          <p>Add some todos!</p>
+        )}
       </div>
     </div>
   );
